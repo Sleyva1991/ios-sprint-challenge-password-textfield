@@ -11,6 +11,7 @@ import UIKit
 class PasswordField: UIControl {
     
     // Public API - these properties are used to fetch the final password and strength values
+    
     private (set) var password: String = ""
     
     private let standardMargin: CGFloat = 8.0
@@ -37,14 +38,13 @@ class PasswordField: UIControl {
     private var mediumView: UIView = UIView()
     private var strongView: UIView = UIView()
     private var strengthDescriptionLabel: UILabel = UILabel()
-    private var showHideImageView: UIImageView = UIImageView()
     
     func setup() {
         // Lay out your subviews here
         
         addSubview(titleLabel)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20).isActive = true
+        titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8).isActive = true
         titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 20).isActive = true
         titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20).isActive = true
         titleLabel.text = "Enter Password"
@@ -60,12 +60,28 @@ class PasswordField: UIControl {
         textField.layer.borderColor = textFieldBorderColor.cgColor
         textField.layer.borderWidth = 2
         textField.layer.cornerRadius = 5
-        showHideButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 50)
-        showHideButton.topAnchor.constraint(equalTo: topAnchor, constant: 8)
-        showHideButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 8)
-        showHideButton.backgroundImage(for: UIImageAsset)
+        
+        addSubview(showHideButton)
+        showHideButton.translatesAutoresizingMaskIntoConstraints = false
+        showHideButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 320).isActive = true
+        showHideButton.topAnchor.constraint(equalTo: topAnchor, constant: 64).isActive = true
+        showHideButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 8).isActive = true
+        showHideButton.setImage(UIImage(named: "eyes-closed"), for: .normal)
+        showHideButton.setImage(UIImage(named: "eyes-open"), for: .normal)
+        showHideButton.addTarget(self, action: Selector(("btntTouched")), for: .touchUpInside)
+        
+    
+        addSubview(weakView)
+        weakView.translatesAutoresizingMaskIntoConstraints = false
+        weakView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8).isActive = true
+        weakView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 8).isActive = true
+        weakView.heightAnchor.constraint(equalToConstant: 8).isActive = true
+        weakView.backgroundColor = unusedColor
+        
+        
         
     }
+
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
