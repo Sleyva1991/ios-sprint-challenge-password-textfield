@@ -8,6 +8,12 @@
 
 import UIKit
 
+enum PasswordStrength: Int {
+    case weak = 1
+    case medium
+    case strong
+}
+
 class PasswordField: UIControl {
     
     // Public API - these properties are used to fetch the final password and strength values
@@ -51,32 +57,63 @@ class PasswordField: UIControl {
         titleLabel.font = labelFont
         titleLabel.textColor = labelTextColor
         
-        addSubview(textField)
+        let textfieldContainerView = UIView()
+        addSubview(textfieldContainerView)
+        textfieldContainerView.translatesAutoresizingMaskIntoConstraints = false
+        textfieldContainerView.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor).isActive = true
+        textfieldContainerView.topAnchor.constraint(equalToSystemSpacingBelow: titleLabel.bottomAnchor, multiplier: 1.0).isActive = true
+        textfieldContainerView.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor).isActive = true
+        textfieldContainerView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        textfieldContainerView.layer.borderColor = textFieldBorderColor.cgColor
+        textfieldContainerView.layer.borderWidth = 2
+        textfieldContainerView.layer.cornerRadius = 5
+
+
+        textfieldContainerView.addSubview(textField)
         textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.leadingAnchor.constraint(equalTo: leadingAnchor, constant: standardMargin).isActive = true
-        textField.topAnchor.constraint(equalTo: topAnchor, constant: textFieldContainerHeight).isActive = true
-        textField.trailingAnchor.constraint(equalTo: trailingAnchor, constant: textFieldMargin).isActive = true
-        textField.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        textField.layer.borderColor = textFieldBorderColor.cgColor
-        textField.layer.borderWidth = 2
-        textField.layer.cornerRadius = 5
+        textField.leadingAnchor.constraint(equalTo: textfieldContainerView.leadingAnchor, constant: 8).isActive = true
+        textField.topAnchor.constraint(equalTo: textfieldContainerView.topAnchor, constant: 8).isActive = true
+        textField.trailingAnchor.constraint(equalTo: textfieldContainerView.trailingAnchor, constant: -8).isActive = true
+        textField.bottomAnchor.constraint(equalTo: textfieldContainerView.bottomAnchor, constant: -8).isActive = true
         
         addSubview(showHideButton)
         showHideButton.translatesAutoresizingMaskIntoConstraints = false
-        showHideButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 320).isActive = true
-        showHideButton.topAnchor.constraint(equalTo: topAnchor, constant: 64).isActive = true
-        showHideButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 8).isActive = true
+        showHideButton.leadingAnchor.constraint(equalTo: textfieldContainerView.leadingAnchor, constant: 300).isActive = true
+        showHideButton.topAnchor.constraint(equalTo:textfieldContainerView.topAnchor, constant: 15).isActive = true
+        showHideButton.trailingAnchor.constraint(equalTo:textfieldContainerView.trailingAnchor, constant: -8).isActive = true
         showHideButton.setImage(UIImage(named: "eyes-closed"), for: .normal)
         showHideButton.setImage(UIImage(named: "eyes-open"), for: .normal)
-        showHideButton.addTarget(self, action: Selector(("btntTouched")), for: .touchUpInside)
+        showHideButton.addTarget(self, action: Selector(("")), for: .touchUpInside)
         
     
         addSubview(weakView)
         weakView.translatesAutoresizingMaskIntoConstraints = false
-        weakView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8).isActive = true
-        weakView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 8).isActive = true
-        weakView.heightAnchor.constraint(equalToConstant: 8).isActive = true
-        weakView.backgroundColor = unusedColor
+        weakView.leadingAnchor.constraint(equalTo: textField.leadingAnchor, constant: 0).isActive = true
+        weakView.trailingAnchor.constraint(equalTo:titleLabel.trailingAnchor, constant: -270).isActive = true
+        weakView.topAnchor.constraint(equalTo: textField.topAnchor, constant: 20)
+        weakView.bottomAnchor.constraint(equalTo: textField.bottomAnchor, constant: 33).isActive = true
+        weakView.heightAnchor.constraint(equalToConstant: 5).isActive = true
+        weakView.backgroundColor = weakColor
+        
+        addSubview(mediumView)
+        mediumView.translatesAutoresizingMaskIntoConstraints = false
+        mediumView.leadingAnchor.constraint(equalTo: weakView.leadingAnchor).isActive = true
+        mediumView.trailingAnchor.constraint(equalTo: textField.trailingAnchor).isActive = true
+        mediumView.topAnchor.constraint(equalTo: textField.topAnchor, constant: 40).isActive = true
+        mediumView.bottomAnchor.constraint(equalTo: textField.bottomAnchor, constant: 0).isActive = true
+        mediumView.heightAnchor.constraint(equalToConstant: 5).isActive = true
+        mediumView.backgroundColor = mediumColor
+
+        
+        addSubview(strengthDescriptionLabel)
+        strengthDescriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+        strengthDescriptionLabel.leadingAnchor.constraint(equalTo: textField.leadingAnchor, constant: 250).isActive = true
+        strengthDescriptionLabel.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 20).isActive = true
+        strengthDescriptionLabel.trailingAnchor.constraint(equalTo: textField.trailingAnchor, constant: 20).isActive = true
+//        strengthDescriptionLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 10)
+        strengthDescriptionLabel.text = "Too Weak"
+        strengthDescriptionLabel.font = labelFont
+        strengthDescriptionLabel.textColor = labelTextColor
         
         
         
@@ -87,6 +124,39 @@ class PasswordField: UIControl {
         super.init(coder: aDecoder)
         setup()
     }
+    
+    func determineStrength(string: String) {
+        var strength = PasswordStrength.weak
+        switch string.count {
+        case 0...7:
+            strength = .weak
+        case 8...15:
+            strength = .medium
+        default:
+            strength = .strong
+        }
+        updateStrength(strength: strength)
+    }
+    
+    func updateStrength(strength: PasswordStrength) {
+        switch strength {
+        case .weak:
+            UIView.animate(withDuration: 0.4) {
+                self.weakView.backgroundColor = self.weakColor
+                self.weakView.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
+            }
+        case .medium:
+            UIView.animate(withDuration: 0.4) {
+                self.mediumView.backgroundColor = self.mediumColor
+                self.mediumView.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
+            }
+        case .strong:
+            UIView.animate(withDuration: 0.4) {
+                self.strongView.backgroundColor = self.strongColor
+                self.strongView.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
+            }
+        }
+    }
 }
 
 extension PasswordField: UITextFieldDelegate {
@@ -95,6 +165,8 @@ extension PasswordField: UITextFieldDelegate {
         let stringRange = Range(range, in: oldText)!
         let newText = oldText.replacingCharacters(in: stringRange, with: string)
         // TODO: send new text to the determine strength method
+        determineStrength(string: newText)
         return true
     }
 }
+
