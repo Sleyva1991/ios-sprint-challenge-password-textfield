@@ -11,7 +11,7 @@ import UIKit
 class ViewController: UIViewController {
     
     @IBAction func updatePasswordValue(_ sender: PasswordField) {
-        
+        print("password is: \(sender.password) strength \(sender.strength)")
     }
     // For use in the stretch goal
     //
